@@ -20,8 +20,9 @@ import (
 	"github.com/astaxie/beego"
 )
 
+func init() {
 
-
+}
 func main() {
 	orm.RunCommand()
 	beego.Run()
