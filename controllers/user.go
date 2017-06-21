@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/bitly/go-simplejson"
 	"github.com/astaxie/beego/httplib"
+	"time"
 )
 
 // Operations about Users
@@ -71,8 +72,23 @@ func (c *UserController) Post(){
 
 func (c *TestController) Get(){
 	var result interface{}
-	request := httplib.Get("http://opdays.com:8080/song/search").Param("key","邓紫棋")
-	request.ToJSON(&result)
-	c.Data["json"] = result
+	chs := make([]chan int,10)
+	fmt.Println(time.Now())
+	for i:=0;i<10;i++{
+		chs[i] = make(chan int)
+		go func(ch chan int) {
+			request := httplib.Get("http://opdays.com:8080/song/search").Param("key","邓紫棋")
+			request.ToJSON(&result)
+			c.Data["json"] = result
+			ch <- 1
+		}(chs[i])
+
+	}
+	fmt.Println(chs)
+	for i:=0;i<10;i++{
+		<-chs[i]
+	}
+
 	c.ServeJSON()
+
 }
